@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import queue
-
+import logging
 from abc import ABCMeta, abstractmethod
 from math import floor
 from matplotlib import style
@@ -18,6 +18,12 @@ class Portfolio(metaclass=ABCMeta):
         raise NotImplementedError
 
 class NaivePortfolio(Portfolio):
+    """
+    The NaivePortfolio object is designed to send orders to
+    a brokerage object with a constant quantity size blindly,
+    i.e. without any risk management or position sizing. It is
+    used to test simpler strategies such as BuyAndHoldStrategy.
+    """
     def __init__(self, data, events, strategy_name, initial_capital=1.0):
         self.data = data
         self.events = events
@@ -30,6 +36,7 @@ class NaivePortfolio(Portfolio):
 
         self.all_holdings = []
         self.current_holdings = self.construct_current_holdings()
+        logging.info(f"Created a NaivePortfolio with the given components")
 
     def construct_current_holdings(self):
         holdings = {symbol: 0.0 for symbol in self.symbol_list}

@@ -1,18 +1,18 @@
 import queue
-import time
-# import config
-from datetime import datetime
-from event import MarketEvent, SignalEvent, OrderEvent, FillEvent
-from data import QuandlDataHandler, HistoricCSVDataHandler, DataSource
-from strategies.hold import BuyAndHoldStrategy, SellAndHoldStrategy
-from strategies.macd import MovingAveragesLongStrategy, MovingAveragesLongShortStrategy, MovingAveragesMomentumStrategy
-from strategies.stop_loss import StopLossStrategy
-from strategies.divide_conquer import DivideAndConquerStrategy
+from data import HistoricCSVDataHandler, DataSource
+from strategies.strategy_1 import MovingAveragesLongStrategy
 from portfolio import NaivePortfolio
 from execution import SimulateExecutionHandler
+import logging
+from common.log import set_logger_name
+
+set_logger_name('strategy_1')
 
 def backtest(events, data, portfolio, strategy, broker):
+    logging.info(f'Started Backtest for strategy_1')
+
     while True:
+        # Update the bars (specific backtest code, as opposed to live trading)
         data.update_latest_data()
         if data.continue_backtest == False:
             break
@@ -44,9 +44,10 @@ def backtest(events, data, portfolio, strategy, broker):
     portfolio.plot_all()
 
 
-
+# Declare the components with respective parameters
 events = queue.Queue()
-data = HistoricCSVDataHandler(events, 'csv/', ['OMXS30'], DataSource.NASDAQ)
+
+data = HistoricCSVDataHandler(events, 'data/', ['OMXS30'], DataSource.NASDAQ)
 portfolio = NaivePortfolio(data, events, '', initial_capital=2000)
 strategy = MovingAveragesLongStrategy(data, events, portfolio, 50, 100, version=1)
 portfolio.strategy_name = strategy.name

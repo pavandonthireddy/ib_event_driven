@@ -8,3 +8,5 @@ class Strategy(metaclass=ABCMeta):
     @abstractmethod
     def plot(self):
         raise NotImplementedError
+
+
