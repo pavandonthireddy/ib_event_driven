@@ -3,9 +3,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
-from datetime import datetime
 from matplotlib import style
-from event import SignalEvent
+from src.event import SignalEvent
 from strategies.strategy import Strategy
 
 class MovingAveragesLongStrategy(Strategy):
