@@ -3,13 +3,14 @@ import os.path
 import queue
 
 from abc import ABCMeta, abstractmethod
-from event import MarketEvent
+from src.event import MarketEvent
 from datetime import datetime
 from enum import Enum
 
 class DataSource(Enum):
     NASDAQ = "NASDAQ"
     YAHOO = "YAHOO"
+    IB = "IB"
 
 class DataHandler(metaclass=ABCMeta):
     """
@@ -48,7 +49,7 @@ class HistoricCSVDataHandler(DataHandler):
     to obtain the "latest" bar in a manner identical to a live
     trading interface.
     """
-    def __init__(self, events, csv_dir, symbol_list, source=DataSource.NASDAQ):
+    def __init__(self, events, csv_dir, symbol_list, source=DataSource.IB):
         self.events = events
         self.csv_dir = csv_dir
         self.symbol_list = symbol_list
@@ -61,7 +62,6 @@ class HistoricCSVDataHandler(DataHandler):
 
         self.time_col = 1
         self.price_col = 2
-
         self._open_convert_csv_files(source)
 
     def _open_convert_csv_files(self, source):
@@ -69,6 +69,8 @@ class HistoricCSVDataHandler(DataHandler):
         for symbol in self.symbol_list:
             if source == DataSource.NASDAQ:
                 self.parse_nasdaq_csv(symbol)
+            elif source == DataSource.IB:
+                self.parse_ib_csv(symbol)
             else:
                 self.parse_yahoo_csv(symbol)
 
@@ -86,7 +88,9 @@ class HistoricCSVDataHandler(DataHandler):
 
     def _get_new_data(self, symbol):
         for row in self.symbol_data[symbol]:
-            yield tuple([symbol, row[0], row[1][0]])
+            # row[0] is datetime, row[1] has open, high, low and clos.
+            yield tuple([symbol, row[0], row[1][0], row[1][1], row[1][2], row[1][3] ])
+
 
     def get_latest_data(self, symbol, N=1):
         try:
@@ -122,6 +126,14 @@ class HistoricCSVDataHandler(DataHandler):
 
     def parse_yahoo_csv(self, symbol):
         self.symbol_data[symbol] = pd.read_csv(os.path.join(self.csv_dir, symbol + '.csv'), header=0, index_col=0, parse_dates=True)
+
+    def parse_ib_csv(self,symbol):
+        tmp = pd.read_csv(os.path.join(self.csv_dir, symbol + '.csv'), header=0, index_col=0, parse_dates=True)
+        tmp = tmp.rename({'open': 'Open', 'high': 'High', 'low':'Low', 'close':'Close'}, axis=1)
+        self.symbol_data[symbol] = tmp
+
+
+
 
     def parse_nasdaq_csv(self, symbol):
         tmp = pd.read_csv(os.path.join(self.csv_dir, symbol + '.csv'), header=0, index_col=0, parse_dates=True).iloc[::-1]

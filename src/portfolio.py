@@ -5,8 +5,8 @@ import logging
 from abc import ABCMeta, abstractmethod
 from math import floor
 from matplotlib import style
-from event import FillEvent, OrderEvent
-from performance import calculate_sharpe_ratio, calculate_drawdowns
+from src.event import FillEvent, OrderEvent
+from src.performance import calculate_sharpe_ratio, calculate_drawdowns
 
 class Portfolio(metaclass=ABCMeta):
     @abstractmethod

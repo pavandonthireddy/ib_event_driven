@@ -2,7 +2,7 @@ import queue
 
 from datetime import datetime
 from abc import ABCMeta, abstractmethod
-from event import FillEvent, OrderEvent
+from src.event import FillEvent, OrderEvent
 
 class ExecutionHandler(metaclass=ABCMeta):
     @abstractmethod

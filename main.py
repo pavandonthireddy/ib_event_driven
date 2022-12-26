@@ -1,13 +1,13 @@
 import queue
 from src.data import HistoricCSVDataHandler, DataSource
-from strategies.strategy_1 import MovingAveragesLongStrategy
+from strategies.strategy_2 import MovingAveragesLongShortStrategy
 from src.portfolio import NaivePortfolio
 from src.execution import SimulateExecutionHandler
 import logging
 from common.log import set_logger_name
 import datetime as dt
 
-set_logger_name('strategy_1')
+set_logger_name('strategy_2')
 
 def backtest(events, data, portfolio, strategy, broker):
     logging.info(f'Started Backtest for strategy_1 at {dt.datetime.now()}')
@@ -48,9 +48,9 @@ def backtest(events, data, portfolio, strategy, broker):
 # Declare the components with respective parameters
 events = queue.Queue()
 
-data = HistoricCSVDataHandler(events, '../data/', ['OMXS30'], DataSource.NASDAQ)
-portfolio = NaivePortfolio(data, events, '', initial_capital=2000)
-strategy = MovingAveragesLongStrategy(data, events, portfolio, 50, 100, version=1)
+data = HistoricCSVDataHandler(events, './data/', ['EUR'], DataSource.IB)
+portfolio = NaivePortfolio(data, events, '', initial_capital=100)
+strategy = MovingAveragesLongShortStrategy(data, events, portfolio, 50, 200, verbose=True, version=1)
 portfolio.strategy_name = strategy.name
 broker = SimulateExecutionHandler(events)
 
