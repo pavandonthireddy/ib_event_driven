@@ -4,7 +4,6 @@ import queue
 import logging
 from abc import ABCMeta, abstractmethod
 from math import floor
-from matplotlib import style
 from src.event import FillEvent, OrderEvent
 from src.performance import calculate_sharpe_ratio, calculate_drawdowns
 
@@ -36,7 +35,6 @@ class NaivePortfolio(Portfolio):
 
         self.all_holdings = []
         self.current_holdings = self.construct_current_holdings()
-        logging.info(f"Created a NaivePortfolio with the given components")
 
     def construct_current_holdings(self):
         holdings = {symbol: 0.0 for symbol in self.symbol_list}
@@ -164,7 +162,6 @@ class NaivePortfolio(Portfolio):
         performance_ax.set_ylabel('Return (%)')
 
     def plot_all(self):
-        style.use('ggplot')
         self.create_equity_curve_dataframe()
         self.plot_performance()
         self.plot_holdings()

@@ -3,7 +3,7 @@ import logging
 existing_logger_name = None
 
 
-logFormatter = logging.Formatter("%(asctime)s - [%(levelname)-5.5s] - [%(name)s] - [%(funcName)s:%(lineno)d] - [%(message)s]")
+logFormatter = logging.Formatter("%(asctime)s - [%(levelname)-5.5s] - [%(name)s] - [%(funcName)s:%(lineno)4d] - [%(message)s]")
 
 
 def set_logger_name(logger_name):

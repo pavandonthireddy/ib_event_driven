@@ -3,7 +3,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
-from matplotlib import style
+import logging
 from src.event import SignalEvent
 from strategies.strategy import Strategy
 
@@ -15,7 +15,7 @@ class MovingAveragesLongShortStrategy(Strategy):
         self.portfolio = portfolio
         self.short_period = short_period
         self.long_period = long_period
-        self.name = 'Moving Averages Long'
+        self.name = 'Moving Averages Long Short'
         self.verbose = verbose
         self.version = version
 
@@ -63,10 +63,6 @@ class MovingAveragesLongShortStrategy(Strategy):
                 df = pd.DataFrame(data, columns=['Symbol','Date','Open', 'High', 'Low', 'Close'])
                 df = df.drop(['Symbol'], axis=1)
                 df.set_index('Date', inplace=True)
-                # if data is not None and len(data) >= self.long_period:
-                #     price_short, price_long = self.calculate_long_short(df)
-                #     date = df.index.values[-1]
-                #     price = df['Close'][-1]
 
                 if data is not None and len(data) >= self.long_period:
                     price_short, price_long = self.calculate_long_short(df)
@@ -80,12 +76,14 @@ class MovingAveragesLongShortStrategy(Strategy):
                         if current_positions !=0:
                             signal = SignalEvent(symbol, date, 'EXIT', math.fabs(current_positions))
                             self.events.put(signal)
-                            if self.verbose: print("Short Exit", date, price,math.fabs(current_positions) )
+                            if self.verbose:
+                                logging.info(f"EXIT SHORT at {date} with price : {price} and quantity : {math.fabs(current_positions)} " )
 
 
                         signal = SignalEvent(symbol, date, 'LONG', quantity)
                         self.events.put(signal)
-                        if self.verbose: print("Long", date, price, quantity)
+                        if self.verbose:
+                            logging.info(f"LONG  at {date} with price: {price} and quantity : {quantity}")
 
                         self.bought[symbol] = True
                         to_append = pd.DataFrame({'Signal': [quantity], 'Date': [date]})
@@ -95,10 +93,12 @@ class MovingAveragesLongShortStrategy(Strategy):
                         quantity = self.portfolio.current_positions[symbol]
                         signal = SignalEvent(symbol, date, 'EXIT', quantity)
                         self.events.put(signal)
-                        if self.verbose: print("Long Exit", date, price, quantity)
+                        if self.verbose:
+                            logging.info(f"EXIT LONG at {date} with price : {price} and quantity : {quantity}")
                         signal = SignalEvent(symbol, date, 'SHORT', quantity)
                         self.events.put(signal)
-                        if self.verbose: print("Short", date, price, quantity)
+                        if self.verbose:
+                            logging.info(f"SHORT at {date} with price : {price} and quantity : {quantity}")
                         self.bought[symbol] = False
                         to_append = pd.DataFrame({'Signal': [-quantity], 'Date': [date]})
                         self.signals[symbol] = pd.concat([self.signals[symbol], to_append])
@@ -107,8 +107,6 @@ class MovingAveragesLongShortStrategy(Strategy):
 
 
     def plot(self):
-        style.use('ggplot')
-
         for symbol in self.symbol_list:
             self.strategy[symbol].set_index('Date', inplace=True)
             self.signals[symbol].set_index('Date', inplace=True)

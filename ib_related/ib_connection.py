@@ -1,8 +1,11 @@
 import datetime
 from ib_insync import *
+from src.settings import ENVIRONMENTS, DATA_DIR
 
 ib = IB()
-ib.connect('127.0.0.1', 7496, clientId=5)
+env = ENVIRONMENTS["IB_SIMULATED"]
+
+ib.connect(env['HOST'], env['PORT'], clientId=env['CLIENT_ID'])
 
 contract = Forex('EURUSD')
 
@@ -11,8 +14,8 @@ summary = ib.accountSummary()
 bars = ib.reqHistoricalData(
     contract,
     endDateTime='',
-    durationStr='22 Y',
-    barSizeSetting='1 day',
+    durationStr='5 D',
+    barSizeSetting='1 min',
     whatToShow='MIDPOINT',
     useRTH=True,
     formatDate=1)
@@ -20,5 +23,5 @@ bars = ib.reqHistoricalData(
 # save to CSV file
 
 df = util.df(bars)
-df.to_csv('../data/'+contract.symbol + '.csv', index=False)
+df.to_csv(DATA_DIR+contract.symbol + '.csv', index=False)
 print("Check")

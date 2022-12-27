@@ -3,7 +3,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import math
-from matplotlib import style
 from src.event import SignalEvent
 from strategies.strategy import Strategy
 
@@ -85,7 +84,6 @@ class MovingAveragesLongStrategy(Strategy):
                         if self.verbose: print("Exit", date, price)
 
     def plot(self):
-        style.use('ggplot')
 
         for symbol in self.symbol_list:
             self.strategy[symbol].set_index('Date', inplace=True)

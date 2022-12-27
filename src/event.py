@@ -34,8 +34,6 @@ class OrderEvent(Event):
         self.quantity = quantity
         self.direction = direction
 
-    def print_order(self):
-        print("Order: Symbol={0}, Type={1}, Quantity={2}, Direction={3}").format(self.symbol, self.order_type, self.quantity, self.direction)
 
 class FillEvent(Event):
     """

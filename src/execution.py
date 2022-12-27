@@ -3,6 +3,7 @@ import queue
 from datetime import datetime
 from abc import ABCMeta, abstractmethod
 from src.event import FillEvent, OrderEvent
+import logging
 
 class ExecutionHandler(metaclass=ABCMeta):
     @abstractmethod
@@ -16,6 +17,7 @@ class SimulateExecutionHandler(ExecutionHandler):
 
     def execute_order(self, event):
         if event.type == 'ORDER':
-            if self.verbose: print("Order Executed:", event.symbol, event.quantity, event.direction)
+            if self.verbose:
+                logging.info(f"Order Executed: {event.symbol}, {event.qunatity}, {event.direction}")
             fill_event = FillEvent(datetime.utcnow(), event.symbol, 'ARCA', event.quantity, event.direction, 0)
             self.events.put(fill_event)
