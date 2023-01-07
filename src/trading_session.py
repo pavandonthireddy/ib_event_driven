@@ -11,7 +11,7 @@ from src.settings import EQUITY
 
 class TradingSession(object):
 
-    def __init__(self, title, session_type="backtest", heartbeat = 0.0, end_session_time = None,  data=None,
+    def __init__(self, title, session_type="backtest", heartbeat=0.0, end_session_time=None, data=None,
                  portfolio=None, strategy=None, broker=None):
         self.session_type = session_type
         self.data = data
@@ -24,31 +24,29 @@ class TradingSession(object):
         self._config_session()
         self.end_session_time = end_session_time
 
-
         if self.session_type == "live":
             if self.end_session_time is None:
                 raise Exception("Must specify an end_session_time when live trading")
-
 
     def _config_session(self):
         """
         Initialises the necessary classes used
         within the session.
         """
-        if self.data == None:
+        if self.data is None:
             self.data = HistoricCSVDataHandler(self.events_queue, './data/', ['EUR'], DataSource.IB)
 
-        if self.portfolio == None:
+        if self.portfolio is None:
             self.portfolio = NaivePortfolio(self.data, self.events_queue, '', initial_capital=EQUITY)
 
-        if self.strategy == None:
+        if self.strategy is None:
             self.strategy = MovingAveragesLongShortStrategy(self.data, self.events_queue, self.portfolio,
                                                             5, 15, verbose=True, version=1)
 
             self.portfolio.strategy_name = self.strategy.name
 
-        if self.broker == None:
-            self.broker = SimulateExecutionHandler(self.events_queue)
+        if self.broker is None:
+            self.broker = SimulateExecutionHandler(self.events_queue, verbose=True)
 
     def _run_session(self):
         """
@@ -66,7 +64,7 @@ class TradingSession(object):
         while True:
             # Update the bars (specific backtest code, as opposed to live trading)
             self.data.update_latest_data()
-            if self.data.continue_backtest == False:
+            if not self.data.continue_backtest:
                 break
 
             while True:
@@ -86,7 +84,7 @@ class TradingSession(object):
                     elif event.type == 'FILL':
                         self.portfolio.update_fill(event)
 
-            if self.heartbeat !=0:
+            if self.heartbeat != 0:
                 time.sleep(self.heartbeat)
 
     def _output_performance(self):
@@ -98,7 +96,6 @@ class TradingSession(object):
         self.strategy.plot()
         self.portfolio.plot_all()
 
-
     def start_trading(self):
         """
         Runs either a backtest or live session, and outputs performance when complete.
@@ -106,13 +103,3 @@ class TradingSession(object):
         self._run_session()
         self._output_performance()
         logging.info("------------------------------TRADING SESSION COMPLETE------------------------------------")
-
-
-
-
-
-
-
-
-
-

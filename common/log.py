@@ -3,7 +3,8 @@ import logging
 existing_logger_name = None
 
 
-logFormatter = logging.Formatter("%(asctime)s - [%(levelname)-5.5s] - [%(name)s] - [%(funcName)s:%(lineno)4d] - [%(message)s]")
+logFormatter = logging.Formatter("%(asctime)s - [%(levelname)-5.5s] - [%(name)s]"
+                                 " - [%(funcName)s:%(lineno)4d] - [%(message)s]")
 
 
 def set_logger_name(logger_name):
@@ -18,16 +19,15 @@ def set_logger_name(logger_name):
     logger = logging.getLogger()
     logger.handlers = []
 
-    fileHandler = logging.FileHandler("{0}/{1}.log".format(directory, logger_name))
-    fileHandler.setFormatter(logFormatter)
-    logger.addHandler(fileHandler)
+    file_handler = logging.FileHandler("{0}/{1}.log".format(directory, logger_name))
+    file_handler.setFormatter(logFormatter)
+    logger.addHandler(file_handler)
 
-    consoleHandler = logging.StreamHandler()
-    consoleHandler.setFormatter(logFormatter)
-    logger.addHandler(consoleHandler)
+    console_handler = logging.StreamHandler()
+    console_handler.setFormatter(logFormatter)
+    logger.addHandler(console_handler)
     logger.setLevel('INFO')
 
     logging.info(f"** LOGGER SET TO {logger_name}")
 
     existing_logger_name = logger_name
-

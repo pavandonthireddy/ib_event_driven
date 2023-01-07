@@ -16,4 +16,4 @@ def calculate_drawdowns(equity_curve):
         drawdown[i] = hwm[i] - equity_curve[i]
         duration[i] = 0 if drawdown[i] == 0 else duration[i-1] + 1
 
-    return drawdown.max(), duration.max()
+    return drawdown, drawdown.max(), duration.max()

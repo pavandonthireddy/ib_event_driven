@@ -17,7 +17,5 @@ class SimulateExecutionHandler(ExecutionHandler):
 
     def execute_order(self, event):
         if event.type == 'ORDER':
-            if self.verbose:
-                logging.info(f"Order Executed: {event.symbol}, {event.qunatity}, {event.direction}")
             fill_event = FillEvent(datetime.utcnow(), event.symbol, 'ARCA', event.quantity, event.direction, 0)
             self.events.put(fill_event)

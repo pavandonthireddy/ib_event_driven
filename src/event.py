@@ -21,6 +21,13 @@ class SignalEvent(Event):
         self.signal_type = signal_type
         self.quantity = quantity
 
+    def __str__(self):
+        return f"{self.signal_type} signal event for {self.symbol} at " \
+               f"{self.datetime} :  quantity {self.quantity}  "
+
+    def __repr__(self):
+        return str(self)
+
 class OrderEvent(Event):
     """
     Handles the event of sending an Order to an execution system.
@@ -33,6 +40,13 @@ class OrderEvent(Event):
         self.order_type = order_type
         self.quantity = quantity
         self.direction = direction
+
+    def __str__(self):
+        return f"{self.order_type} {self.direction} Order event " \
+               f"for {self.symbol} and quantity : {self.quantity}"
+
+    def __repr__(self):
+        return str(self)
 
 
 class FillEvent(Event):
@@ -55,6 +69,14 @@ class FillEvent(Event):
             self.commission = self.calculate_ib_commission()
         else:
             self.commission = commission
+
+    def __str__(self):
+        return f"Fill event at {self.timeindex} for {self.symbol} : " \
+               f"{self.direction} quantity :{self.quantity} "
+
+    def __repr__(self):
+        return str(self)
+
 
     def calculate_ib_commission(self):
         full_cost = 1.3

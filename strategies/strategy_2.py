@@ -74,16 +74,16 @@ class MovingAveragesLongShortStrategy(Strategy):
                         current_positions = self.portfolio.current_positions[symbol]
                         quantity = math.floor(self.portfolio.current_holdings['cash'] / price + current_positions)
                         if current_positions !=0:
-                            signal = SignalEvent(symbol, date, 'EXIT', math.fabs(current_positions))
+                            signal = SignalEvent(symbol, date, 'EXIT SHORT', math.fabs(current_positions))
                             self.events.put(signal)
                             if self.verbose:
-                                logging.info(f"EXIT SHORT at {date} with price : {price} and quantity : {math.fabs(current_positions)} " )
+                                logging.info(signal)
 
 
                         signal = SignalEvent(symbol, date, 'LONG', quantity)
                         self.events.put(signal)
                         if self.verbose:
-                            logging.info(f"LONG  at {date} with price: {price} and quantity : {quantity}")
+                            logging.info(signal)
 
                         self.bought[symbol] = True
                         to_append = pd.DataFrame({'Signal': [quantity], 'Date': [date]})
@@ -91,14 +91,14 @@ class MovingAveragesLongShortStrategy(Strategy):
 
                     elif self.bought[symbol] == True and price_short < price_long:
                         quantity = self.portfolio.current_positions[symbol]
-                        signal = SignalEvent(symbol, date, 'EXIT', quantity)
+                        signal = SignalEvent(symbol, date, 'EXIT LONG', quantity)
                         self.events.put(signal)
                         if self.verbose:
-                            logging.info(f"EXIT LONG at {date} with price : {price} and quantity : {quantity}")
+                            logging.info(signal)
                         signal = SignalEvent(symbol, date, 'SHORT', quantity)
                         self.events.put(signal)
                         if self.verbose:
-                            logging.info(f"SHORT at {date} with price : {price} and quantity : {quantity}")
+                            logging.info(signal)
                         self.bought[symbol] = False
                         to_append = pd.DataFrame({'Signal': [-quantity], 'Date': [date]})
                         self.signals[symbol] = pd.concat([self.signals[symbol], to_append])

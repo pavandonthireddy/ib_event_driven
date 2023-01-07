@@ -108,9 +108,9 @@ class NaivePortfolio(Portfolio):
         if direction == 'SHORT':
             order = OrderEvent(symbol, order_type, market_quantity, 'SELL')
 
-        if direction == 'EXIT' and current_quantity > 0:
+        if direction == 'EXIT LONG' and current_quantity > 0:
             order = OrderEvent(symbol, order_type, market_quantity, 'SELL')
-        if direction == 'EXIT' and current_quantity < 0:
+        if direction == 'EXIT SHORT' and current_quantity < 0:
             order = OrderEvent(symbol, order_type, market_quantity, 'BUY')
 
         return order
@@ -135,7 +135,8 @@ class NaivePortfolio(Portfolio):
         pnl = self.equity_curve['equity_curve']
 
         sharpe_ratio = calculate_sharpe_ratio(returns)
-        max_dd, dd_duration = calculate_drawdowns(pnl)
+        drawdown, max_dd, dd_duration = calculate_drawdowns(pnl)
+        self.equity_curve['drawdown'] = drawdown
 
         stats = [("Total Return", "%0.2f%%" % ((total_return - 1.0) * 100.0)),
                 ("Sharpe Ratio", "%0.2f" % sharpe_ratio),
@@ -151,6 +152,15 @@ class NaivePortfolio(Portfolio):
         holdings_ax.set_xlabel('Time')
         holdings_ax.set_ylabel('Total')
 
+    def plot_drawdown(self):
+        self.create_equity_curve_dataframe()
+        drawdown_fig, drawdown_ax = plt.subplots()
+        drawdown, _, _= calculate_drawdowns(self.equity_curve['equity_curve'])
+        drawdown.plot(ax=drawdown_ax)
+        drawdown_ax.set_title('Drawdown ')
+        drawdown_ax.set_xlabel('Time')
+        drawdown_ax.set_ylabel('Drawdown %')
+
     def plot_performance(self):
         performance_df = self.data.create_baseline_dataframe()
         performance_df[self.strategy_name] = self.equity_curve['equity_curve']
@@ -161,8 +171,11 @@ class NaivePortfolio(Portfolio):
         performance_ax.set_xlabel('Time')
         performance_ax.set_ylabel('Return (%)')
 
+
+
     def plot_all(self):
         self.create_equity_curve_dataframe()
         self.plot_performance()
         self.plot_holdings()
+        self.plot_drawdown()
         plt.show()
